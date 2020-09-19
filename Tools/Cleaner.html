@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+
+<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" style="height: 100%">
+<head>
+    <!-- Other shit -->
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial scale=1.0">
+    <link rel="Icon" type="image/x-icon" href="../Images/Anarchy.png">
+    <title>Loz 'Bey</title>
+
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="../css/ODH.css">
+    <link href="https://fonts.googleapis.com/css?family=Roboto:100,300" rel="stylesheet">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+
+
+    <!-- JS -->
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script type="text/javascript" src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+    <script src="../js/Toast.js"></script>
+    <script src="../js/Error.js"></script>
+    <script src="../js/Cleaner.js"></script>
+</head>
+
+<style>
+  .form-check-label {
+    font-weight:300; 
+    font-size: 15px;
+  }
+</style>
+
+<nav id="odh-nav" class="navbar navbar-inverse" style="border: none">
+    <div class="container-fluid">
+      <div class="navbar-header">
+        <a class="navbar-brand" style="font-family: Roboto;" href="../Dashboard.html">Loz 'Bey</a>
+      </div>
+      <ul class="nav navbar-nav">
+        <li class="dropdown">
+          <a class="dropdown-toggle" data-toggle="dropdown">Management<span class="caret"></span></a>
+          <ul class="dropdown-menu">
+            <li><a href="../Dashboard.html">Dashboard</a></li>
+            <li><a href="../Bot/List.html">Bots</a></li>
+          </ul>
+        </li>
+        <li class="dropdown">
+            <a class="dropdown-toggle" data-toggle="dropdown">Saldırı Türleri<span class="caret"></span></a>
+            <ul class="dropdown-menu">
+               <li><a href="../Bot/Joiner.html">Sunucuya Sokma</a></li>
+            <li><a href="../Bot/Leaver.html">Sunucudan Ayrılma</a></li>
+            <li><a href="../Bot/Flooder.html">Kanala Spam Attırma</a></li>
+            <li><a href="../Bot/Friender.html">Dost Ekleme</a></li>
+            <li><a href="../Bot/Reactions.html">Reaksiyon</a></li>
+            <li><a href="../Bot/VCSpammer.html">VC spammer</a></li>
+            </ul>
+        </li>
+        <li class="dropdown active">
+            <a class="dropdown-toggle" data-toggle="dropdown">Araçlar<span class="caret"></span></a>
+            <ul class="dropdown-menu">
+            <li><a href="Checker.html">Denetleyici</a></li>
+            <li><a href="Cleaner.html">Temizleyici</a></li>
+            <li><a href="Recon.html">Sunucu Keşfi</a></li>
+            </ul>
+        </li>
+    </ul>
+  </div>
+  </nav> 
+
+<body class="dark-body">
+    <h1 class="dark-title" style="margin-top: 40px; text-align: center">Bot Temizleyici</h1>
+
+    <fieldset id="clean-options">
+        <form class="form-control dark-container center-block" style="width: 50%; min-width: 210px; height: 300px; position: relative; margin-top: 30px">
+
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" id="remove-guilds" checked>
+              <label class="form-check-label" for="remove-guilds">Loncaları Kaldır</label>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" id="remove-relationships" checked>
+              <label class="form-check-label" for="remove-relationships">İlişkileri Kaldır</label>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" id="remove-privates" checked>
+              <label class="form-check-label" for="remove-privates">DM Leri Sil</label>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" id="reset-profile">
+              <label class="form-check-label" for="reset-profile">Profilleri Temizle</label>
+            </div>
+      
+            <button class="btn dark-btn" data-dismiss="modal" style="width: 180px; position: absolute; bottom: 13px; right: 13px" onclick="StartCleaner()">Başlat</button>
+          </form>
+    </fieldset>
+
+
+    <div class="center-block" style="width: 50%; min-width: 210px; margin-top: 55px">
+      <h3 class="dark-title" style="text-align: left">Logs</h3>
+
+      <textarea id="cleaner-logs" class="form-control dark-container" rows="14" style="width: 100%; margin-top: 10px; resize: none" readonly></textarea>
+    </div>
+</html>
