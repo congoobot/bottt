@@ -1,25 +1,24 @@
-const {EmbedBuilder} = require("discord.js");
-const { prefix } = require("../config.js")
+const { PermissionsBitField } = require("discord.js");
+module.exports = {
+    name:"kick",
+    description: 'Kullanıcıyı Sunucudan Atarsın.',
+    type:1,
+    options: [
+        {
+            name:"user",
+            description:"Atılacak Kullanıcıyı Seçin.",
+            type:6,
+            required:true
+        },
+       
+    ],
+  run: async(client, interaction) => {
 
-exports.run = async (client, message, args) => {
+    if(!interaction.member.permissions.has(PermissionsBitField.Flags.KickMembers)) return interaction.reply({content: "Üyeleri At Yetkin Yok!", ephemeral: true})
+    const user = interaction.options.getMember('user')
+    if(user.permissions.has(PermissionsBitField.Flags.KickMembers)) return interaction.reply({content:"Bu Kullanıcının Kullanıcıları Atma Yetkisi Olduğu İçin Onu Yasaklayamadım.   ",ephemeral:true})
+    user.kick();
+    interaction.reply({content: "Başarıyla Üyeyi Attım!"})
+}
 
-  
-   if(!message.member.permissions.has("KICK_MEMBERS")) return message.reply("Üyeleri At Yetkiniz Yok.")
-    
-   const member = message.mentions.members.first();
-  
-   if(!member) return message.reply("Lütfen Atılacak   Kişiyi Belirtiniz.")
-
-  
-   member.kick();
-  
-  message.reply(" Atıldı! ")
-
-};
-exports.conf = {
-  aliases: []
-};
-
-exports.help = {
-  name: "kick"
 };

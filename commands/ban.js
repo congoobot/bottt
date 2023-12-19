@@ -1,45 +1,30 @@
+const { Client, EmbedBuilder, PermissionsBitField } = require("discord.js");
+module.exports = {
+    name:"ban",
+    description: 'Kullanıcıyı Sunucudan Yasaklarsın.',
+    type:1,
+    options: [
+        {
+            name:"user",
+            description:"Yasaklanıcak Kullanıcıyı Seçin.",
+            type:6,
+            required:true
+        },
+        {
+            name:"reason",
+            description:"Hangi Sebepten dolayı yasaklanıcak?",
+            type:3,
+            required:true
+        },
+    ],
+  run: async(client, interaction) => {
 
-const Discord = require("discord.js");
-
-exports.run = async (client, message, args) => {
-
-
-        if(!message.member.permissions.has("BAN_MEMBERS")) return message.channel.send("Üyeleri Banla Yetkiniz Yok.")
-
-
-        let user = message.mentions.users.first();
-
-
-
-
-        if(!user) return message.channel.send("Lütfen Banlanacak Kişiyi Belirtiniz.")
-
-
-
-
-const üye = message.guild.members.cache.get(user.id)
-
-
-üye.ban()
-
-
-
-
-
-
-
-
-message.channel.send("Banladım!")
-
-
-
-
+    if(!interaction.member.permissions.has(PermissionsBitField.Flags.BanMembers)) return interaction.reply({content: "Üyeleri Yasakla Yetkin Yok!", ephemeral: true})
+    const user = interaction.options.getMember('user')
+    const sebep = interaction.options.getString('reason')
+    if(user.permissions.has(PermissionsBitField.Flags.BanMembers)) return interaction.reply({content:"Bu Kullanıcının Ban Yetkisi Olduğu İçin Onu Yasaklayamadım.   ",ephemeral:true})
+    user.ban({reason: sebep});
+    interaction.reply({content: "Başarıyla Üyeyi Yasakladım!"})
 }
 
-  exports.conf = {
-  aliases: []
-};
-
-exports.help = {
-  name: "ban"
 };

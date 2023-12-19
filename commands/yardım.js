@@ -1,46 +1,32 @@
-const {EmbedBuilder, ActionRowBuilder, SelectMenuBuilder} = require("discord.js");
-const config = require("../config.js")
-let prefix = config.prefix
-exports.run = async (client, message, args) => {
+const { Client, EmbedBuilder } = require("discord.js");
+const Discord = require("discord.js")
+module.exports = {
+  name: "yardım",
+  description: "Botun yardım menüsüne bakarsın!",
+  type: 1,
+  options: [],
 
-const row = new ActionRowBuilder()
+  run: async(client, interaction) => {
+
+    const embed = new EmbedBuilder()
+    .setTitle("Godzilla - Yardım Menüsü!")
+    .setDescription("**・Moderasyon Sistemi ↷**\n > Moderasyon Sistemi hakkında bilgi alabilirsiniz.⠀⠀⠀⠀⠀\n\n**・Kayıt Sistemi ↷**\n> Kayıt Sistemi hakkında bilgi alabilirsiniz.\n\n**・Kullanıcı Sistemi ↷**\n> Kullanıcı Sistemi hakkında bilgi alabilirsiniz.")
+    .setColor("Random")
+    const row = new Discord.ActionRowBuilder()
     .addComponents(
-      new SelectMenuBuilder()
-      .setCustomId("yardım")
-      .setPlaceholder('Yardım Menüsüne Hoşgeldin!')
-      .setMinValues(1)
-      .setMaxValues(1)
-      .addOptions([
-       
- 
-        {
-          label:"Moderasyon" ,
-          description:"Moderasyon Komutlarını Görürsün!",
-          value:"moderasyon",
-          emoji:"869707733685927936"
-        },
-        {
-          label:"Kullanıcı",
-          description:"Kullanıcı komutlarını görürsün!",
-          value:"kullanıcı",
-          emoji:"869707733685927936"
-        }
-      
-        
-        ])
-      )
-    
-    let embed = new EmbedBuilder()
-.setTitle("Yardım Menüsü")
-.setDescription("Yardım Menüsüne Hoşgeldin!")
-message.channel.send({embeds: [embed], components: [row]})
+new Discord.ButtonBuilder()
+.setLabel("Moderasyon")
+.setStyle(Discord.ButtonStyle.Secondary)
+.setCustomId("moderasyon"),
+new Discord.ButtonBuilder()
+.setLabel("Kayıt")
+.setStyle(Discord.ButtonStyle.Success)
+.setCustomId("kayıt"),
+new Discord.ButtonBuilder()
+.setLabel("Kullanıcı")
+.setStyle(Discord.ButtonStyle.Primary)
+.setCustomId("kullanıcı"))
+interaction.reply({embeds: [embed], components: [row], ephemeral: true})
+  }
 
-
-};
-exports.conf = {
-  aliases: []
-};
-
-exports.help = {
-  name: "yardım"
 };

@@ -1,11 +1,9 @@
-const { Client, GatewayIntentBits, Partials, ButtonBuilder, ButtonStyle, ActionRowBuilder, ModalBuilder, TextInputBuilder, TextInputStyle, InteractionType } = require("discord.js");
-const Discord = require("discord.js")
-const config = require("./config.js");
-let prefix = config.prefix
-const db = require("croxydb")
+const { Client, GatewayIntentBits, Partials } = require("discord.js");
 const INTENTS = Object.values(GatewayIntentBits);
 const PARTIALS = Object.values(Partials);
-const client = global.client = new Discord.Client({
+const Discord = require("discord.js")
+const db = require("croxydb")
+const client = new Client({
     intents: INTENTS,
     allowedMentions: {
         parse: ["users"]
@@ -14,233 +12,181 @@ const client = global.client = new Discord.Client({
     retryLimit: 3
 });
 
+global.client = client;
+client.commands = (global.commands = []);
 
-module.exports = client;
+const { readdirSync } = require("fs")
+const { TOKEN } = require("./config.json");
+readdirSync('./commands').forEach(f => {
+  if(!f.endsWith(".js")) return;
 
-require("./events/message.js") 
+ const props = require(`./commands/${f}`);
 
-require("./events/ready.js")
+ client.commands.push({
+       name: props.name.toLowerCase(),
+       description: props.description,
+       options: props.options,
+       dm_permission: props.dm_permission,
+       type: 1
+ });
+
+console.log(`[COMMAND] ${props.name} komutu yüklendi.`)
+
+});
+readdirSync('./events').forEach(e => {
+
+  const eve = require(`./events/${e}`);
+  const name = e.split(".")[0];
+
+  client.on(name, (...args) => {
+            eve(client, ...args)
+        });
+console.log(`[EVENT] ${name} eventi yüklendi.`)
+});
+
+
+client.login(TOKEN)
 
 client.on("guildMemberAdd", member => {
-  const kanal = db.get(`gckanal_${member.guild.id}`)
+  const kanal = db.get(`hgbb_${member.guild.id}`)
   if(!kanal) return;
   member.guild.channels.cache.get(kanal).send({content: `:inbox_tray: | ${member} sunucuya katıldı! Sunucumuz **${member.guild.memberCount}** kişi oldu.`})
 })
 
+client.on("messageCreate", async message => {
+  const db = require("croxydb");
+
+  if (await db.get(`afk_${message.author.id}`)) {
+   
+    db.delete(`afk_${message.author.id}`);
+
+    message.reply("Afk Modundan Başarıyla Çıkış Yaptın!");
+  }
+
+  var kullanıcı = message.mentions.users.first();
+  if (!kullanıcı) return;
+  var sebep = await db.get(`afk_${kullanıcı.id}`);
+
+  if (sebep) {
+    message.reply("Etiketlediğin Kullanıcı **"+sebep+"** Sebebiyle Afk Modunda!");
+  }
+});
+client.on("guildMemberAdd", member => {
+  const rol = db.get(`otorol_${member.guild.id}`)
+  if(!rol) return;
+  member.roles.add(rol).catch(() => {})
+
+})
+client.on("guildMemberAdd", member => {
+  const tag = db.get(`ototag_${member.guild.id}`)
+  if(!tag) return;
+  member.setNickname(`${tag} | ${member.displayName}`)
+})
 client.on("guildMemberRemove", member => {
-  const kanal = db.get(`gckanal_${member.guild.id}`)
+  const kanal = db.get(`hgbb_${member.guild.id}`)
   if(!kanal) return;
   member.guild.channels.cache.get(kanal).send({content: `:outbox_tray: | ${member} sunucudan ayrıldı! Sunucumuz **${member.guild.memberCount}** kişi oldu.`})
 })
 
-client.on("interactionCreate", async (interaction, message) => {
-    const dc = require("discord.js")
-    try {
-    if(!interaction.isSelectMenu()) return
-    
-    if(interaction.customId === "yardım") {
-      
-      let message = await interaction.channel.messages.fetch(interaction.message.id)
-      let value = interaction.values
-      
-      if(value[0] === "moderasyon") {
-        await interaction.deferUpdate()
-        
-        const embed = new Discord.EmbedBuilder()
-        .setTitle("Moderasyon Komutları!")
-    .setDescription(`${prefix}ban\n${prefix}kick\n${prefix}oto-rol\n${prefix}temizle\n${prefix}hg-bb\n${prefix}başvur\n${prefix}başvuru-kanal\n${prefix}başvuru-log\n${prefix}başvuru-rol\n${prefix}kayıt-rol\n${prefix}kayıt\n${prefix}kayıt-log`) 
-        .setTimestamp()
-   
-        
-        await message.edit({embeds: [embed]})
-        
-      } else if(value[0] === "kullanıcı") { 
-        await interaction.deferUpdate()
-        
-        const embed = new Discord.EmbedBuilder()
-      .setTitle("Kullanıcı Komutlarım!")
-    .setDescription(`${prefix}istatistik\n${prefix}ping\n${prefix}yardım\n${prefix}avatar\n${prefix}sunucu\n${prefix}snake\n${prefix}snipe`)
-     
-        .setTimestamp()
+client.on("messageCreate", (message) => {
+  const db = require("croxydb")
+  let kufur = db.fetch(`kufurengel_${message.guild.id}`)
+  if(!kufur) return;
   
-        await message.edit({embeds:[embed]})
-        }
-      
-    }
+  if(kufur) {
+  const kufurler = [
     
-    // if error
-    } catch(e) {
-     
-    }
-  })
+    "amk",
+    "piç",
+    "yarrak",
+    "oç",
+    "göt",
+    "amq",
+    "yavşak",
+    "amcık",
+    "amcı",
+    "orospu",
+    "sikim",
+    "sikeyim",
+    "aq",
+    "mk"
+       
+  ]
+  
+if(kufurler.some(alo => message.content.toLowerCase().includes(alo))) {
+message.delete()
+message.channel.send(`Hey <@${message.author.id}>, Bu Sunucuda Küfür Engel Sistemi Aktif! `)
+}
+}
+})
+client.on("messageCreate", (message) => {
+  const db = require("croxydb")
+  let reklamlar = db.fetch(`reklamengel_${message.guild.id}`)
+  if(!reklamlar) return;
+  
+  if(reklamlar) {
 
-client.on('messageDelete', message => {
-
-  db.set(`snipe.mesaj.${message.guild.id}`, message.content)
-  db.set(`snipe.id.${message.guild.id}`, message.author.id)
-
+  const linkler = [
+    
+    ".com.tr",
+    ".net",
+    ".org",
+    ".tk",
+    ".cf",
+    ".gf",
+    "https://",
+    ".gq",
+    "http://",
+    ".com",
+    ".gg",
+    ".porn",
+    ".edu"
+       
+  ]
+  
+if(linkler.some(alo => message.content.toLowerCase().includes(alo))) {
+message.delete()
+message.channel.send(`Hey <@${message.author.id}>, Bu Sunucuda Reklam Engel Sistemi Aktif! `)
+}
+}
 })
 
-
-const modal = new ModalBuilder()
-.setCustomId('form')
-.setTitle('Godzilla - Başvuru Formu!')
-  const a1 = new TextInputBuilder()
-  .setCustomId('isim')
-  .setLabel('İsminiz?')
-  .setStyle(TextInputStyle.Paragraph) 
-  .setMinLength(2)
-  .setPlaceholder('Arda')
-  .setRequired(true)
-	const a2 = new TextInputBuilder() 
-	.setCustomId('yas')
-	.setLabel('Yaşınız Kaçtır?')
-  .setStyle(TextInputStyle.Paragraph)  
-	.setMinLength(1)
-	.setPlaceholder('15')
-	.setRequired(true)
-	const a3 = new TextInputBuilder() 
-	.setCustomId('biz')
-	.setLabel('Neden Biz?')
-  .setStyle(TextInputStyle.Paragraph)  
-	.setMinLength(1)
-	.setPlaceholder('Neden Bizimle Çalışmak İstiyorsun?')
-	.setRequired(true)
-	const a4 = new TextInputBuilder() 
-	.setCustomId('yetkili')
-	.setLabel('Daha Önce Bir Sunucuda Yetkili Oldun Mu?')
-	.setMinLength(1)
-  .setStyle(TextInputStyle.Paragraph)  
-	.setPlaceholder('Farklı bir sunucuda yetkili oldun mu?')
-	const a5 = new TextInputBuilder() 
-    .setCustomId('aciklama')
-    .setLabel('Eklemek İstediğin?')
-    .setMinLength(1)
-    .setStyle(TextInputStyle.Paragraph) 
-    .setPlaceholder('Ek olarak bir şey söylemek istiyorsan yazabilirsin.')
-    const row = new ActionRowBuilder().addComponents(a1);
-    const row2 = new ActionRowBuilder().addComponents(a2);
-    const row3 = new ActionRowBuilder().addComponents(a3);
-    const row4 = new ActionRowBuilder().addComponents(a4);
-    const row5 = new ActionRowBuilder().addComponents(a5);
-    modal.addComponents(row, row2, row3, row4, row5);
+client.on("messageCreate", (message) => {
   
-   
-client.on('interactionCreate', async (interaction) => {
+  let saas = db.fetch(`saas_${message.guild.id}`)
+  if(!saas) return;
+  
+  if(saas) {
+  
+  let selaamlar = message.content.toLowerCase()  
+if(selaamlar === 'sa' || selaamlar === 'slm' || selaamlar === 'sea' || selaamlar === ' selamünaleyküm' || selaamlar === 'Selamün Aleyküm' || selaamlar === 'selam'){
 
-	if(interaction.customId === "başvuru"){
-    await interaction.showModal(modal);
-	}
+message.channel.send(`<@${message.author.id}> Aleykümselam, Hoşgeldin ☺️`)
+}
+}
 })
- 
-    client.on('interactionCreate', async interaction => {
-      if (interaction.type !== InteractionType.ModalSubmit) return;
-      if (interaction.customId === 'form') {
-
-  let kanal = db.fetch(`basvurulog_${interaction.guild.id}`)
-let rol = db.fetch(`basvururol_${interaction.guild.id}`)
-
-
-		const isim = interaction.fields.getTextInputValue('isim')
-		const yas = interaction.fields.getTextInputValue('yas')
-		const biz = interaction.fields.getTextInputValue('biz')
-		const yetkili = interaction.fields.getTextInputValue('yetkili')
-    const aciklama = interaction.fields.getTextInputValue('aciklama')
-	
+client.on("interactionCreate", async interaction => {
+  if (!interaction.isButton()) return;
+  let message = await interaction.channel.messages.fetch(interaction.message.id)  
+  if(interaction.customId == "moderasyon") {
+const embed = new Discord.EmbedBuilder()
+.setTitle("Godzilla - Yardım Menüsü!")
+.setDescription("/ban-list - **Banlı Kullanıcıları Gösterir!**\n/ban - **Bir Üyeyi Yasaklarsın!**\n/emojiler - **Emojileri Görürsün!**\n/forceban - **ID İle Bir Kullanıcıyı Yasaklarsın!**\n/giriş-çıkış - **Giriş çıkış kanalını ayarlarsın!**\n/kanal-açıklama - **Kanalın Açıklamasını Değiştirirsin!**\n/kick - **Bir Üyeyi Atarsın!**\n/küfür-engel - **Küfür Engel Sistemini Açıp Kapatırsın!**\n/oto-rol - **Otorolü Ayarlarsın!**\n/oto-tag - **Oto Tagı Ayarlarsın!**\n/oylama - **Oylama Açarsın!**\n/reklam-engel - **Reklam Engel Sistemini Açarsın!**\n/rol-al - **Rol Alırsın**\n/rol-oluştur - **Rol Oluşturursun!**\n/rol-ver - **Rol Verirsin!**\n/sa-as - **Selam Sistemine Bakarsın!**\n/temizle - **Mesaj Silersin!**\n/unban - **Bir üyenin yasağını kaldırırsın!**")
+.setColor("Random")
+interaction.reply({embeds: [embed], components: [], ephemeral: true})
+  }
+  if(interaction.customId == "kayıt") {
     const embed = new Discord.EmbedBuilder()
-    .setTitle("Yeni Başvuru Geldi!")
-    .setDescription(`Başvuran: **${interaction.user.tag}**\n\nİsim: **${isim}**\n\nYaş: **${yas}**\n\nNeden Biz? **${biz}**\n\nYetkili Olduğu Sunucular: **${yetkili}**\n\nAçıklama: **${aciklama}**         ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀`)
-    .setColor(0x0099FF)
-    const row = new Discord.ActionRowBuilder()
-    .addComponents(
-    new ButtonBuilder()
-    .setCustomId('evet')
-    .setLabel('Evet')
-    .setStyle(ButtonStyle.Success),
-    new ButtonBuilder()
-    .setCustomId("hayir")
-    .setLabel("Hayır")
-    .setStyle(ButtonStyle.Danger))
-  
-    
-    
-
-
-    await interaction.reply({ content: 'Başvurun gönderildi.', ephemeral: true });
-    client.channels.cache.get(kanal).send({embeds: [embed], components: [row]}).then(async m => {
-      db.set(`basvuru_${m.id}`, interaction.user.id)
-      })
-    }
-    })
-
-
-
-
-client.on("interactionCreate", async (interaction) => {
-  if (!interaction.isButton()) return;
-
-if (interaction.customId == "evet") {
-  interaction.deferUpdate()
-  const data = await db.get(`basvuru_${interaction.message.id}`)
-  if(!data) return;
-const uye = data;
-  let log = db.fetch(`basvurukanal_${interaction.guild.id}`)
-  let rol = db.fetch(`basvururol_${interaction.guild.id}`)
- 
-  client.channels.cache.get(log).send(`<@${uye}> Adlı Kullanıcının Başvurusu Kabul Edildi Rolleri Verildi.`)
-interaction.guild.members.cache.get(uye).roles.add(rol)
-
-}
+    .setTitle("Godzilla - Yardım Menüsü!")
+    .setDescription("/kayıtlı-rol - **Kayıtlı Rolünü Ayarlarsın!**\n/kayıt-et - **Bir Üyeyi Kayıt Edersin!**")
+    .setColor("Random")
+    interaction.reply({embeds: [embed], components: [], ephemeral: true})
+  }
+  if(interaction.customId == "kullanıcı") {
+    const embed = new Discord.EmbedBuilder()
+    .setTitle("Godzilla - Yardım Menüsü!")
+    .setDescription("/avatar - **Bir Kullanıcının Avatarına Bakarsın!**\n/afk - **Sebepli Afk Olursun!**\n/emoji-yazı - **Bota Emoji İle Yazı Yazdırırsın!**\n/istatistik - **Bot istatistiklerini gösterir!**\n/kurucu-kim - **Kurucuyu Gösterir!**\n/ping - **Botun pingini gösterir!**\n/yardım - **Yardım Menüsünü Gösterir!**")
+    .setColor("Random")
+    interaction.reply({embeds: [embed], components: [], ephemeral: true})
+  }
 })
-
-
-client.on("interactionCreate", async (interaction) => {
-  if (!interaction.isButton()) return;
-
-if (interaction.customId == "hayir") {
-  interaction.deferUpdate()
-  const data = await db.get(`basvuru_${interaction.message.id}`)
-  if(!data) return;
-const uye = data;
-  let log = db.fetch(`basvurukanal_${interaction.guild.id}`)
-  
- 
-  client.channels.cache.get(log).send(`<@${uye}> Adlı Kullanıcının Başvurusu Red Edildi.`)
-
-}
-})
-  
-client.on("guildMemberAdd", async(member) => {
-  
- const rol = db.fetch(`otorol_${member.guild.iḋ}`).rol
- 
- member.roles.add(rol)
-  
-  
-});
-
-
-    
-
-
-
-
-
-
-
-
-
-
-    
-    
-
-
-
-
-
-
-
-
-client.login(process.env.token)
-
-

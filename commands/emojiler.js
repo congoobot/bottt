@@ -1,23 +1,24 @@
-const Discord = require("discord.js");
+const { Client, EmbedBuilder } = require("discord.js");
 
-exports.run = async (client, message, args) => {
+module.exports = {
+  name: "emojiler",
+  description: "Sunucudaki Emojileri Görürsün!!",
+  type: 1,
+  options: [],
 
+  run: async(client, interaction) => {
+
+  
 let animEmotes = [], staticEmotes = [];
-message.guild.emojis.cache.forEach((x) => {
-x.animated ? animEmotes.push(`<a:${x.name}:${x.id}>`) : staticEmotes.push(`<:${x.name}:${x.id}>`);
+interaction.guild.emojis.cache.forEach((x) => {
+x.animated ? animEmotes.push(`<a:${x.name}:${x.id}>`) : staticEmotes.push(`<:${x.name}: ${x.id}>`);
 })
-const msg = new Discord.EmbedBuilder()
+const embed = new EmbedBuilder()
 .setTimestamp()
-.setColor('#a400ff')
-.setTitle(`${message.guild.name}, Sunucusunun emojileri. \n\n `)
-.setDescription(`${animEmotes}, ${staticEmotes}`)
-message.reply({embeds : [msg]})
+.setColor('#ff0000')
+.setTitle(`Godzilla - Emoji List!`)
+.setDescription(`${animEmotes} ${staticEmotes}`)
+interaction.reply({embeds: [embed]})
+  }
 
-    };
-exports.conf = {
-  aliases: ['emojiler']
-};
-
-exports.help = {
-  name: "emojiler"
 };
